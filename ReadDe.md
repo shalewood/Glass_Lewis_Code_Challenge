@@ -23,3 +23,7 @@ Then OK
 Rebuild All Solution
 
 Once Done, then Run the Solution
+
+In Client Apply
+
+Click on Company Link in Nav Bar
