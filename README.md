@@ -4,6 +4,8 @@ Download the Soution
 
 Run The SQl Script First
 
+Change Your Connection String :  "DefaultConnection": "Server=<<Server>>;Database=CompanyAPIDB;Trusted_Connection=True;TrustServerCertificate=True"
+
 Then Build The Solution
 
 Right Click On Solution in Solution Explorer
