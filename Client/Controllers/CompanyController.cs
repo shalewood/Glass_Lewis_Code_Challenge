@@ -14,8 +14,6 @@ namespace Client.Controllers
     public class CompanyAPIController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly IMemoryCache _memoryCache;
-        private readonly string _companyCacheKey = "companies";
         private string _apiURL = "https://localhost:7001/api/";
 
         public CompanyAPIController()
@@ -24,16 +22,12 @@ namespace Client.Controllers
             {
                 BaseAddress = new Uri(_apiURL)
             };
-            _memoryCache = new MemoryCache(new MemoryCacheOptions());
         }
 
         // GET: Company
         public async Task<ActionResult> Index()
         {
-            if (_memoryCache.TryGetValue(_companyCacheKey, out List<CompanyDTO> cachedCompanies))
-            {
-                return View(cachedCompanies);
-            }
+          
 
             try
             {
@@ -42,9 +36,6 @@ namespace Client.Controllers
                 {
                     string jsonData = await response.Content.ReadAsStringAsync();
                     var companies = JsonConvert.DeserializeObject<List<CompanyDTO>>(jsonData);
-
-                    // Store the list in cache for 5 minutes
-                    _memoryCache.Set(_companyCacheKey, companies, TimeSpan.FromMinutes(5));
                     return View(companies);
                 }
                 else
@@ -89,14 +80,6 @@ namespace Client.Controllers
         // Get: Company/Edit/5
         public async Task<ActionResult> Edit(int id)
         {
-            // Try to retrieve the specific company from the cache using the company id as key
-            var companyCacheKey = $"{_companyCacheKey}_{id}";
-            if (_memoryCache.TryGetValue(companyCacheKey, out CompanyDTO cachedCompany))
-            {
-                return View(cachedCompany);
-            }
-
-            // If the company is not found in the cache, fetch it from the source // Refactor to make maybe single method "DRY"
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync($"Company/{id}");
@@ -105,8 +88,7 @@ namespace Client.Controllers
                     string jsonData = await response.Content.ReadAsStringAsync();
                     var company = JsonConvert.DeserializeObject<CompanyDTO>(jsonData);
 
-                    // Cache the company object with its ID as part of the key for 5 minutes
-                    _memoryCache.Set(companyCacheKey, company, TimeSpan.FromMinutes(5));
+                   
                     return View(company);
                 }
                 else
@@ -189,7 +171,6 @@ namespace Client.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _memoryCache.Remove(_companyCacheKey);
                     return RedirectToAction("Index");
                 }
                 else
