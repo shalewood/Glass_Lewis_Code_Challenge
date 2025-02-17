@@ -22,7 +22,7 @@ namespace Client.Controllers
         {
             _httpClient = new HttpClient
             {
-                BaseAddress = new Uri(_apiURL) // Change this to your actual API URL
+                BaseAddress = new Uri(_apiURL)
             };
             _memoryCache = new MemoryCache(new MemoryCacheOptions());
         }
@@ -96,7 +96,7 @@ namespace Client.Controllers
                 return View(cachedCompany);
             }
 
-            // If the company is not found in the cache, fetch it from the source
+            // If the company is not found in the cache, fetch it from the source // Refactor to make maybe single method "DRY"
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync($"Company/{id}");
@@ -189,13 +189,13 @@ namespace Client.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _memoryCache.Remove(_companyCacheKey); // Clear cache
+                    _memoryCache.Remove(_companyCacheKey);
                     return RedirectToAction("Index");
                 }
                 else
                 {
                     ModelState.AddModelError("", "Failed to delete company.");
-                    return View("Error"); // Or redirect back to the Delete confirmation page
+                    return View("Error");
                 }
             }
             catch (Exception ex)
